@@ -1,6 +1,4 @@
-// Example new F2P for decorator created (need to be modified accordingly with the AI Solution)
-
-/* import 'reflect-metadata';
+import 'reflect-metadata';
 import { expect } from 'chai';
 import { PARAM_ARGS_METADATA } from '../../constants';
 import { Ack } from '../../decorators/ack.decorator';
@@ -27,4 +25,4 @@ describe('@Ack', () => {
     };
     expect(argsMetadata).to.be.eql(expectedMetadata);
   });
-}); */
+});

@@ -135,7 +135,7 @@ describe('WebSocketsController', () => {
           message: 'message',
           methodName: 'methodName',
           callback: handlerCallback,
-          // isAckHandledManually: false, -- Necessary P2P AFTER solution, need to be modified accordingly with AI Solution
+          isAckHandledManually: false,
         },
       ];
       server = { server: 'test' };
@@ -174,7 +174,7 @@ describe('WebSocketsController', () => {
           message: 'message',
           methodName: 'methodName',
           callback: messageHandlerCallback,
-          // isAckHandledManually: false, -- Necessary P2P AFTER solution, need to be modified accordingly with AI Solution
+          isAckHandledManually: false,
         },
       ]);
     });
@@ -190,13 +190,13 @@ describe('WebSocketsController', () => {
           methodName: 'findOne',
           message: 'find',
           callback: null!,
-          // isAckHandledManually: false, -- Necessary P2P AFTER solution, need to be modified accordingly with AI Solution
+          isAckHandledManually: false,
         },
         {
           methodName: 'create',
           message: 'insert',
           callback: null!,
-          // isAckHandledManually: false, -- Necessary P2P AFTER solution, need to be modified accordingly with AI Solution
+          isAckHandledManually: false,
         },
       ];
       const insertEntrypointDefinitionSpy = sinon.spy(
@@ -430,12 +430,12 @@ describe('WebSocketsController', () => {
         {
           message: 'test',
           callback: { bind: () => 'testCallback' },
-          // isAckHandledManually: true, -- Necessary P2P AFTER solution, need to be modified accordingly with AI Solution
+          isAckHandledManually: true,
         },
         {
           message: 'test2',
           callback: { bind: () => 'testCallback2' },
-          // isAckHandledManually: false, -- Necessary P2P AFTER solution, need to be modified accordingly with AI Solution
+          isAckHandledManually: false,
         },
       ];
     });
@@ -443,8 +443,7 @@ describe('WebSocketsController', () => {
       instance.subscribeMessages(handlers, client, gateway);
       expect(onSpy.calledTwice).to.be.true;
     });
-    // Example new F2P for decorator created (need to be modified accordingly with the AI Solution)
-    /* it('THETA-F2P: should pass "isAckHandledManually" flag to the adapter', () => {
+    it('THETA-F2P: should pass "isAckHandledManually" flag to the adapter', () => {
       const adapter = config.getIoAdapter();
       const bindMessageHandlersSpy = sinon.spy(adapter, 'bindMessageHandlers');
 
@@ -461,7 +460,7 @@ describe('WebSocketsController', () => {
       expect(handlersPassedToAdapter[1].isAckHandledManually).to.equal(
         handlers[1].isAckHandledManually,
       );
-    }); */
+    });
   });
   describe('pickResult', () => {
     describe('when deferredResult contains value which', () => {
