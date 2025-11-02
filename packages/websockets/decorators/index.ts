@@ -1,3 +1,4 @@
+export * from './ack.decorator';
 export * from './connected-socket.decorator';
 export * from './gateway-server.decorator';
 export * from './message-body.decorator';

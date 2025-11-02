@@ -14,6 +14,8 @@ export class WsParamsFactory {
         return args[0];
       case WsParamtype.PAYLOAD:
         return data ? args[1]?.[data] : args[1];
+      case WsParamtype.ACK:
+        return args[2];
       default:
         return null;
     }

@@ -10,9 +10,10 @@ describe('WsParamsFactory', () => {
   describe('exchangeKeyForValue', () => {
     const client = {};
     const data = { data: true };
+    const ack = () => {};
 
     describe('when key is', () => {
-      const args = [client, data];
+      const args = [client, data, ack];
       describe(`WsParamtype.PAYLOAD`, () => {
         it('should return a message payload object', () => {
           expect(
@@ -30,6 +31,13 @@ describe('WsParamsFactory', () => {
           expect(
             factory.exchangeKeyForValue(WsParamtype.SOCKET, null!, args),
           ).to.be.eql(client);
+        });
+      });
+      describe(`WsParamtype.ACK`, () => {
+        it('should return the acknowledgement callback', () => {
+          expect(
+            factory.exchangeKeyForValue(WsParamtype.ACK, null!, args),
+          ).to.be.eql(ack);
         });
       });
     });

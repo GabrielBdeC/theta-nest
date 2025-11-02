@@ -8,6 +8,7 @@ export const NAMESPACE_METADATA = 'namespace';
 export const PORT_METADATA = 'port';
 export const GATEWAY_OPTIONS = 'websockets:gateway_options';
 export const PARAM_ARGS_METADATA = ROUTE_ARGS_METADATA;
+export const IS_ACK_HANDLED_MANUALLY = 'websockets:is_ack_handled_manually';
 
 export const CONNECTION_EVENT = 'connection';
 export const DISCONNECT_EVENT = 'disconnect';

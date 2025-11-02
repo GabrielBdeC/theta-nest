@@ -1,7 +1,9 @@
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 import { MetadataScanner } from '../../core/metadata-scanner';
+import { Ack } from '../decorators/ack.decorator';
 import { WebSocketServer } from '../decorators/gateway-server.decorator';
+import { MessageBody } from '../decorators/message-body.decorator';
 import { WebSocketGateway } from '../decorators/socket-gateway.decorator';
 import { SubscribeMessage } from '../decorators/subscribe-message.decorator';
 import { GatewayMetadataExplorer } from '../gateway-metadata-explorer';
@@ -27,6 +29,12 @@ describe('GatewayMetadataExplorer', () => {
 
     @SubscribeMessage(secMessage)
     public testSec() {}
+
+    @SubscribeMessage('withAck')
+    public testWithAck(@MessageBody() data: any, @Ack() ack: any) {}
+
+    @SubscribeMessage('withoutAck')
+    public testWithoutAck(@MessageBody() data: any) {}
 
     public noMessage() {}
   }
@@ -61,8 +69,22 @@ describe('GatewayMetadataExplorer', () => {
     });
     it(`should return message mapping properties when "isMessageMapping" metadata is not undefined`, () => {
       const metadata = instance.exploreMethodMetadata(test, 'test')!;
-      expect(metadata).to.have.keys(['callback', 'message', 'methodName']);
+      expect(metadata).to.have.keys([
+        'callback',
+        'message',
+        'methodName',
+        'isAckHandledManually',
+      ]);
       expect(metadata.message).to.eql(message);
+      expect(metadata.isAckHandledManually).to.be.false;
+    });
+    it(`should detect when @Ack() decorator is used and set isAckHandledManually to true`, () => {
+      const metadata = instance.exploreMethodMetadata(test, 'testWithAck')!;
+      expect(metadata.isAckHandledManually).to.be.true;
+    });
+    it(`should set isAckHandledManually to false when @Ack() decorator is not used`, () => {
+      const metadata = instance.exploreMethodMetadata(test, 'testWithoutAck')!;
+      expect(metadata.isAckHandledManually).to.be.false;
     });
   });
   describe('scanForServerHooks', () => {

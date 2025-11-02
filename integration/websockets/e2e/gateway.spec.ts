@@ -100,6 +100,54 @@ describe('WebSocketGateway', () => {
     );
   });
 
+  it(`should handle manual acknowledgement with @Ack() decorator`, async () => {
+    app = await createNestApp(ApplicationGateway);
+    await app.listen(3000);
+
+    ws = io('http://localhost:8080');
+
+    const result = await new Promise<any>(resolve => {
+      ws.emit('manualAck', { test: 'data' }, response => {
+        resolve(response);
+      });
+    });
+
+    expect(result.status).to.be.eql('manual');
+    expect(result.data.test).to.be.eql('data');
+  });
+
+  it(`should handle async manual acknowledgement with @Ack() decorator`, async () => {
+    app = await createNestApp(ApplicationGateway);
+    await app.listen(3000);
+
+    ws = io('http://localhost:8080');
+
+    const result = await new Promise<any>(resolve => {
+      ws.emit('asyncManualAck', { test: 'async' }, response => {
+        resolve(response);
+      });
+    });
+
+    expect(result.status).to.be.eql('async');
+    expect(result.data.test).to.be.eql('async');
+  });
+
+  it(`should handle implicit acknowledgement when @Ack() is not used`, async () => {
+    app = await createNestApp(ApplicationGateway);
+    await app.listen(3000);
+
+    ws = io('http://localhost:8080');
+
+    const result = await new Promise<any>(resolve => {
+      ws.emit('implicitAck', { test: 'implicit' }, response => {
+        resolve(response);
+      });
+    });
+
+    expect(result.status).to.be.eql('implicit');
+    expect(result.data.test).to.be.eql('implicit');
+  });
+
   describe('shared server for WS and Long-Running connections', () => {
     afterEach(() => {});
     it('should block application shutdown', function (done) {

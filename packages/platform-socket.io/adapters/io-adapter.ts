@@ -44,7 +44,7 @@ export class IoAdapter extends AbstractWsAdapter {
       first(),
     );
 
-    handlers.forEach(({ message, callback }) => {
+    handlers.forEach(({ message, callback, isAckHandledManually }) => {
       const source$ = fromEvent(socket, message).pipe(
         mergeMap((payload: any) => {
           const { data, ack } = this.mapPayload(payload);
@@ -59,7 +59,10 @@ export class IoAdapter extends AbstractWsAdapter {
         if (response.event) {
           return socket.emit(response.event, response.data);
         }
-        isFunction(ack) && ack(response);
+        // Only auto-ack if handler doesn't use @Ack() decorator
+        if (!isAckHandledManually) {
+          isFunction(ack) && ack(response);
+        }
       });
     });
   }
