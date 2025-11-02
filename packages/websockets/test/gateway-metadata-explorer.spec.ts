@@ -1,16 +1,16 @@
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 import { MetadataScanner } from '../../core/metadata-scanner';
-import { Ack } from '../decorators/ack.decorator';
 import { WebSocketServer } from '../decorators/gateway-server.decorator';
-import { MessageBody } from '../decorators/message-body.decorator';
 import { WebSocketGateway } from '../decorators/socket-gateway.decorator';
 import { SubscribeMessage } from '../decorators/subscribe-message.decorator';
+import { Ack } from '../decorators/ack.decorator';
 import { GatewayMetadataExplorer } from '../gateway-metadata-explorer';
 
 describe('GatewayMetadataExplorer', () => {
   const message = 'test';
   const secMessage = 'test2';
+  const ackMessage = 'ack-test';
 
   @WebSocketGateway()
   class Test {
@@ -30,11 +30,8 @@ describe('GatewayMetadataExplorer', () => {
     @SubscribeMessage(secMessage)
     public testSec() {}
 
-    @SubscribeMessage('withAck')
-    public testWithAck(@MessageBody() data: any, @Ack() ack: any) {}
-
-    @SubscribeMessage('withoutAck')
-    public testWithoutAck(@MessageBody() data: any) {}
+    @SubscribeMessage(ackMessage)
+    public testWithAck(@Ack() ack: Function) {}
 
     public noMessage() {}
   }
@@ -63,11 +60,11 @@ describe('GatewayMetadataExplorer', () => {
     beforeEach(() => {
       test = new Test();
     });
-    it(`should return null when "isMessageMapping" metadata is undefined`, () => {
+    it(`THETA-P2P: should return null when "isMessageMapping" metadata is undefined`, () => {
       const metadata = instance.exploreMethodMetadata(test, 'noMessage');
       expect(metadata).to.eq(null);
     });
-    it(`should return message mapping properties when "isMessageMapping" metadata is not undefined`, () => {
+    it(`THETA-P2P: should return message mapping properties when "isMessageMapping" metadata is not undefined`, () => {
       const metadata = instance.exploreMethodMetadata(test, 'test')!;
       expect(metadata).to.have.keys([
         'callback',
@@ -76,19 +73,18 @@ describe('GatewayMetadataExplorer', () => {
         'isAckHandledManually',
       ]);
       expect(metadata.message).to.eql(message);
-      expect(metadata.isAckHandledManually).to.be.false;
     });
-    it(`should detect when @Ack() decorator is used and set isAckHandledManually to true`, () => {
+    it('THETA-F2P: should set "isAckHandledManually" property to true when @Ack decorator is used', () => {
       const metadata = instance.exploreMethodMetadata(test, 'testWithAck')!;
       expect(metadata.isAckHandledManually).to.be.true;
     });
-    it(`should set isAckHandledManually to false when @Ack() decorator is not used`, () => {
-      const metadata = instance.exploreMethodMetadata(test, 'testWithoutAck')!;
+    it('THETA-F2P: should set "isAckHandledManually" property to false when @Ack decorator is not used', () => {
+      const metadata = instance.exploreMethodMetadata(test, 'test')!;
       expect(metadata.isAckHandledManually).to.be.false;
     });
   });
-  describe('scanForServerHooks', () => {
-    it(`should return properties with @Client decorator`, () => {
+  describe('THETA-P2P: scanForServerHooks', () => {
+    it(`THETA-P2P: should return properties with @Client decorator`, () => {
       const obj = new Test();
       const servers = [...instance.scanForServerHooks(obj as any)];
 
