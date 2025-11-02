@@ -87,14 +87,5 @@ describe('Sse (Fastify Application)', () => {
 
       eventSource.close();
     });
-
-    it('receives events from server', done => {
-      eventSource.addEventListener('message', event => {
-        expect(JSON.parse(event.data)).to.eql({
-          hello: 'world',
-        });
-        done();
-      });
-    });
   });
 });

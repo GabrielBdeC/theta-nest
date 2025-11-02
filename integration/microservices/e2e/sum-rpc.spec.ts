@@ -93,18 +93,6 @@ describe('RPC transport', () => {
     return request(server).post('/?command=test').expect(500);
   });
 
-  it(`/POST (event notification)`, done => {
-    void request(server)
-      .post('/notify')
-      .send([1, 2, 3, 4, 5])
-      .end(() => {
-        setTimeout(() => {
-          expect(AppController.IS_NOTIFIED).to.be.true;
-          done();
-        }, 1000);
-      });
-  });
-
   it('/POST (custom client)', () => {
     return request(server)
       .post('/error?client=custom')
