@@ -15,7 +15,7 @@ async function createNestApp(...gateways): Promise<INestApplication> {
 describe('WebSocketGateway (ack)', () => {
   let ws, app;
 
-  it(`should handle message with ack (http)`, async () => {
+  it(`THETA-P2P: should handle message with ack (http)`, async () => {
     app = await createNestApp(AckGateway);
     await app.listen(3000);
 
@@ -28,7 +28,7 @@ describe('WebSocketGateway (ack)', () => {
     );
   });
 
-  it(`should handle message with ack & without data (http)`, async () => {
+  it(`THETA-P2P: should handle message with ack & without data (http)`, async () => {
     app = await createNestApp(AckGateway);
     await app.listen(3000);
 
@@ -36,6 +36,39 @@ describe('WebSocketGateway (ack)', () => {
     await new Promise<void>(resolve =>
       ws.emit('push', data => {
         expect(data).to.be.eql('pong');
+        resolve();
+      }),
+    );
+  });
+
+  it('THETA-F2P: should handle manual ack for async operations when @Ack() is used (success case)', async () => {
+    app = await createNestApp(AckGateway);
+    await app.listen(3000);
+
+    ws = io('http://localhost:8080');
+    const payload = { shouldSucceed: true };
+
+    await new Promise<void>(resolve =>
+      ws.emit('manual-ack', payload, response => {
+        expect(response).to.eql({ status: 'success', data: payload });
+        resolve();
+      }),
+    );
+  });
+
+  it('THETA-F2P: should handle manual ack for async operations when @Ack() is used (error case)', async () => {
+    app = await createNestApp(AckGateway);
+    await app.listen(3000);
+
+    ws = io('http://localhost:8080');
+    const payload = { shouldSucceed: false };
+
+    await new Promise<void>(resolve =>
+      ws.emit('manual-ack', payload, response => {
+        expect(response).to.eql({
+          status: 'error',
+          message: 'Operation failed',
+        });
         resolve();
       }),
     );

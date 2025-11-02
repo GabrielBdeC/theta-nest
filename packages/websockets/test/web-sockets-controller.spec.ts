@@ -74,7 +74,7 @@ describe('WebSocketsController', () => {
       subscribeToServerEvents = sinon.spy();
       untypedInstance.subscribeToServerEvents = subscribeToServerEvents;
     });
-    it('should throw "InvalidSocketPortException" when port is not a number', () => {
+    it('THETA-P2P: should throw "InvalidSocketPortException" when port is not a number', () => {
       Reflect.defineMetadata(PORT_METADATA, 'test', InvalidGateway);
       expect(() =>
         instance.connectGatewayToServer(
@@ -85,7 +85,7 @@ describe('WebSocketsController', () => {
         ),
       ).throws(InvalidSocketPortException);
     });
-    it('should call "subscribeToServerEvents" with default values when metadata is empty', () => {
+    it('THETA-P2P: should call "subscribeToServerEvents" with default values when metadata is empty', () => {
       const gateway = new DefaultGateway();
       instance.connectGatewayToServer(
         gateway,
@@ -96,7 +96,7 @@ describe('WebSocketsController', () => {
       expect(subscribeToServerEvents.calledWith(gateway, {}, 0, 'moduleKey')).to
         .be.true;
     });
-    it('should call "subscribeToServerEvents" when metadata is valid', () => {
+    it('THETA-P2P: should call "subscribeToServerEvents" when metadata is valid', () => {
       const gateway = new Test();
       instance.connectGatewayToServer(
         gateway,
@@ -135,6 +135,7 @@ describe('WebSocketsController', () => {
           message: 'message',
           methodName: 'methodName',
           callback: handlerCallback,
+          // isAckHandledManually: false, -- Necessary P2P AFTER solution, need to be modified accordingly with AI Solution
         },
       ];
       server = { server: 'test' };
@@ -147,7 +148,7 @@ describe('WebSocketsController', () => {
       instance['assignServerToProperties'] = assignServerToProperties;
       instance['subscribeEvents'] = subscribeEvents;
     });
-    it('should call "assignServerToProperties" with expected arguments', () => {
+    it('THETA-P2P: should call "assignServerToProperties" with expected arguments', () => {
       instance.subscribeToServerEvents(
         gateway,
         { namespace },
@@ -158,7 +159,7 @@ describe('WebSocketsController', () => {
       expect(assignServerToProperties.calledWith(gateway, server.server)).to.be
         .true;
     });
-    it('should call "subscribeEvents" with expected arguments', () => {
+    it('THETA-P2P: should call "subscribeEvents" with expected arguments', () => {
       instance.subscribeToServerEvents(
         gateway,
         { namespace },
@@ -173,12 +174,13 @@ describe('WebSocketsController', () => {
           message: 'message',
           methodName: 'methodName',
           callback: messageHandlerCallback,
+          // isAckHandledManually: false, -- Necessary P2P AFTER solution, need to be modified accordingly with AI Solution
         },
       ]);
     });
   });
   describe('inspectEntrypointDefinitions', () => {
-    it('should inspect & insert corresponding entrypoint definitions', () => {
+    it('THETA-P2P: should inspect & insert corresponding entrypoint definitions', () => {
       class GatewayHostCls {}
 
       const port = 80;
@@ -188,11 +190,13 @@ describe('WebSocketsController', () => {
           methodName: 'findOne',
           message: 'find',
           callback: null!,
+          // isAckHandledManually: false, -- Necessary P2P AFTER solution, need to be modified accordingly with AI Solution
         },
         {
           methodName: 'create',
           message: 'insert',
           callback: null!,
+          // isAckHandledManually: false, -- Necessary P2P AFTER solution, need to be modified accordingly with AI Solution
         },
       ];
       const insertEntrypointDefinitionSpy = sinon.spy(
@@ -272,25 +276,25 @@ describe('WebSocketsController', () => {
       untypedInstance.subscribeDisconnectEvent = subscribeDisconnectEvent;
     });
 
-    it('should call "subscribeConnectionEvent" with expected arguments', () => {
+    it('THETA-P2P: should call "subscribeConnectionEvent" with expected arguments', () => {
       instance.subscribeEvents(gateway, handlers, server);
       expect(subscribeConnectionEvent.calledWith(gateway, server.connection)).to
         .be.true;
     });
-    it('should call "subscribeDisconnectEvent" with expected arguments', () => {
+    it('THETA-P2P: should call "subscribeDisconnectEvent" with expected arguments', () => {
       instance.subscribeEvents(gateway, handlers, server);
       expect(subscribeDisconnectEvent.calledWith(gateway, server.disconnect)).to
         .be.true;
     });
-    it('should call "subscribeInitEvent" with expected arguments', () => {
+    it('THETA-P2P: should call "subscribeInitEvent" with expected arguments', () => {
       instance.subscribeEvents(gateway, handlers, server);
       expect(subscribeInitEvent.calledWith(gateway, server.init)).to.be.true;
     });
-    it('should bind connection handler to server', () => {
+    it('THETA-P2P: should bind connection handler to server', () => {
       instance.subscribeEvents(gateway, handlers, server);
       expect(onSpy.calledWith('connection', getConnectionHandler())).to.be.true;
     });
-    it('should call "getConnectionHandler" with expected arguments', () => {
+    it('THETA-P2P: should call "getConnectionHandler" with expected arguments', () => {
       instance.subscribeEvents(gateway, handlers, server);
       expect(
         getConnectionHandler.calledWith(
@@ -343,19 +347,19 @@ describe('WebSocketsController', () => {
       fn(client);
     });
 
-    it('should return function', () => {
+    it('THETA-P2P: should return function', () => {
       expect(
         instance.getConnectionHandler(null!, null!, null!, null!, null!),
       ).to.be.a('function');
     });
-    it('should call "next" method of connection object with expected argument', () => {
+    it('THETA-P2P: should call "next" method of connection object with expected argument', () => {
       expect(nextSpy.calledWith([client])).to.be.true;
     });
-    it('should call "subscribeMessages" with expected arguments', () => {
+    it('THETA-P2P: should call "subscribeMessages" with expected arguments', () => {
       expect(subscribeMessages.calledWith(handlers, client, gateway)).to.be
         .true;
     });
-    it('should call "on" method of client object with expected arguments', () => {
+    it('THETA-P2P: should call "on" method of client object with expected arguments', () => {
       expect(onSpy.called).to.be.true;
     });
   });
@@ -367,11 +371,11 @@ describe('WebSocketsController', () => {
       subscribe = sinon.spy();
       event = { subscribe, pipe: sinon.stub().returnsThis() };
     });
-    it('should not call subscribe method when "afterInit" method not exists', () => {
+    it('THETA-P2P: should not call subscribe method when "afterInit" method not exists', () => {
       instance.subscribeInitEvent(gateway, event);
       expect(subscribe.called).to.be.false;
     });
-    it('should call subscribe method of event object with expected arguments when "afterInit" exists', () => {
+    it('THETA-P2P: should call subscribe method of event object with expected arguments when "afterInit" exists', () => {
       (gateway as any).afterInit = () => {};
       instance.subscribeInitEvent(gateway, event);
       expect(subscribe.called).to.be.true;
@@ -385,11 +389,11 @@ describe('WebSocketsController', () => {
       subscribe = sinon.spy();
       event = { subscribe, pipe: sinon.stub().returnsThis() };
     });
-    it('should not call subscribe method when "handleConnection" method not exists', () => {
+    it('THETA-P2P: should not call subscribe method when "handleConnection" method not exists', () => {
       instance.subscribeConnectionEvent(gateway, event);
       expect(subscribe.called).to.be.false;
     });
-    it('should call subscribe method of event object with expected arguments when "handleConnection" exists', () => {
+    it('THETA-P2P: should call subscribe method of event object with expected arguments when "handleConnection" exists', () => {
       (gateway as any).handleConnection = () => {};
       instance.subscribeConnectionEvent(gateway, event);
       expect(subscribe.called).to.be.true;
@@ -403,11 +407,11 @@ describe('WebSocketsController', () => {
       subscribe = sinon.spy();
       event = { subscribe, pipe: sinon.stub().returnsThis() };
     });
-    it('should not call subscribe method when "handleDisconnect" method not exists', () => {
+    it('THETA-P2P: should not call subscribe method when "handleDisconnect" method not exists', () => {
       instance.subscribeDisconnectEvent(gateway, event);
       expect(subscribe.called).to.be.false;
     });
-    it('should call subscribe method of event object with expected arguments when "handleDisconnect" exists', () => {
+    it('THETA-P2P: should call subscribe method of event object with expected arguments when "handleDisconnect" exists', () => {
       (gateway as any).handleDisconnect = () => {};
       instance.subscribeDisconnectEvent(gateway, event);
       expect(subscribe.called).to.be.true;
@@ -423,19 +427,46 @@ describe('WebSocketsController', () => {
       client = { on: onSpy, off: onSpy };
 
       handlers = [
-        { message: 'test', callback: { bind: () => 'testCallback' } },
-        { message: 'test2', callback: { bind: () => 'testCallback2' } },
+        {
+          message: 'test',
+          callback: { bind: () => 'testCallback' },
+          // isAckHandledManually: true, -- Necessary P2P AFTER solution, need to be modified accordingly with AI Solution
+        },
+        {
+          message: 'test2',
+          callback: { bind: () => 'testCallback2' },
+          // isAckHandledManually: false, -- Necessary P2P AFTER solution, need to be modified accordingly with AI Solution
+        },
       ];
     });
-    it('should bind each handler to client', () => {
+    it('THETA-P2P: should bind each handler to client', () => {
       instance.subscribeMessages(handlers, client, gateway);
       expect(onSpy.calledTwice).to.be.true;
     });
+    // Example new F2P for decorator created (need to be modified accordingly with the AI Solution)
+    /* it('THETA-F2P: should pass "isAckHandledManually" flag to the adapter', () => {
+      const adapter = config.getIoAdapter();
+      const bindMessageHandlersSpy = sinon.spy(adapter, 'bindMessageHandlers');
+
+      instance.subscribeMessages(handlers, client, gateway);
+
+      const handlersPassedToAdapter = bindMessageHandlersSpy.firstCall.args[1];
+
+      expect(handlersPassedToAdapter[0].message).to.equal(handlers[0].message);
+      expect(handlersPassedToAdapter[0].isAckHandledManually).to.equal(
+        handlers[0].isAckHandledManually,
+      );
+
+      expect(handlersPassedToAdapter[1].message).to.equal(handlers[1].message);
+      expect(handlersPassedToAdapter[1].isAckHandledManually).to.equal(
+        handlers[1].isAckHandledManually,
+      );
+    }); */
   });
   describe('pickResult', () => {
     describe('when deferredResult contains value which', () => {
       describe('is a Promise', () => {
-        it('should return Promise<Observable>', async () => {
+        it('THETA-P2P: should return Promise<Observable>', async () => {
           const value = 100;
           expect(
             await lastValueFrom(
@@ -448,7 +479,7 @@ describe('WebSocketsController', () => {
       });
 
       describe('is an Observable', () => {
-        it('should return Promise<Observable>', async () => {
+        it('THETA-P2P: should return Promise<Observable>', async () => {
           const value = 100;
           expect(
             await lastValueFrom(
@@ -459,7 +490,7 @@ describe('WebSocketsController', () => {
       });
 
       describe('is an object that has the method `subscribe`', () => {
-        it('should return Promise<Observable>', async () => {
+        it('THETA-P2P: should return Promise<Observable>', async () => {
           const value = { subscribe() {} };
           expect(
             await lastValueFrom(
@@ -470,7 +501,7 @@ describe('WebSocketsController', () => {
       });
 
       describe('is an ordinary value', () => {
-        it('should return Promise<Observable>', async () => {
+        it('THETA-P2P: should return Promise<Observable>', async () => {
           const value = 100;
           expect(
             await lastValueFrom(

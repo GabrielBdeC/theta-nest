@@ -4,11 +4,13 @@ import { MetadataScanner } from '../../core/metadata-scanner';
 import { WebSocketServer } from '../decorators/gateway-server.decorator';
 import { WebSocketGateway } from '../decorators/socket-gateway.decorator';
 import { SubscribeMessage } from '../decorators/subscribe-message.decorator';
+// import { Ack } from '../decorators/ack.decorator'; -- Necessary F2P AFTER solution, need to be modified accordingly with AI Solution
 import { GatewayMetadataExplorer } from '../gateway-metadata-explorer';
 
 describe('GatewayMetadataExplorer', () => {
   const message = 'test';
   const secMessage = 'test2';
+  // const ackMessage = 'ack-test'; -- Necessary F2P AFTER solution, need to be modified accordingly with AI Solution
 
   @WebSocketGateway()
   class Test {
@@ -27,6 +29,9 @@ describe('GatewayMetadataExplorer', () => {
 
     @SubscribeMessage(secMessage)
     public testSec() {}
+
+    /* @SubscribeMessage(ackMessage) -- Necessary F2P AFTER solution, need to be modified accordingly with AI Solution
+    public testWithAck(@Ack() ack: Function) {} */
 
     public noMessage() {}
   }
@@ -55,18 +60,33 @@ describe('GatewayMetadataExplorer', () => {
     beforeEach(() => {
       test = new Test();
     });
-    it(`should return null when "isMessageMapping" metadata is undefined`, () => {
+    it(`THETA-P2P: should return null when "isMessageMapping" metadata is undefined`, () => {
       const metadata = instance.exploreMethodMetadata(test, 'noMessage');
       expect(metadata).to.eq(null);
     });
-    it(`should return message mapping properties when "isMessageMapping" metadata is not undefined`, () => {
+    it(`THETA-P2P: should return message mapping properties when "isMessageMapping" metadata is not undefined`, () => {
       const metadata = instance.exploreMethodMetadata(test, 'test')!;
       expect(metadata).to.have.keys(['callback', 'message', 'methodName']);
+      /* expect(metadata).to.have.keys([ -- Necessary F2P AFTER solution, need to be modified accordingly with AI Solution
+        'callback',
+        'message',
+        'methodName',
+        'isAckHandledManually',
+      ]); */
       expect(metadata.message).to.eql(message);
     });
+    // Necessary F2P AFTER solution, need to be modified accordingly with AI Solution
+    /* it('THETA-F2P: should set "isAckHandledManually" property to true when @Ack decorator is used', () => {
+      const metadata = instance.exploreMethodMetadata(test, 'testWithAck')!;
+      expect(metadata.isAckHandledManually).to.be.true;
+    });
+    it('THETA-F2P: should set "isAckHandledManually" property to false when @Ack decorator is not used', () => {
+      const metadata = instance.exploreMethodMetadata(test, 'test')!;
+      expect(metadata.isAckHandledManually).to.be.false;
+    }); */
   });
-  describe('scanForServerHooks', () => {
-    it(`should return properties with @Client decorator`, () => {
+  describe('THETA-P2P: scanForServerHooks', () => {
+    it(`THETA-P2P: should return properties with @Client decorator`, () => {
       const obj = new Test();
       const servers = [...instance.scanForServerHooks(obj as any)];
 
